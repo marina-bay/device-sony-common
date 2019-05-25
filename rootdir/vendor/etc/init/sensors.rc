@@ -6,7 +6,13 @@ on post-fs-data
     mkdir /data/misc/sensors 0775 system system
 
     # Fix sensors permissions
-    chown system system /persist/sensors
+    chown system system /mnt/vendor/persist/sensors/
+    chown system system /mnt/vendor/persist/sensors/error_log
+    chown system system /mnt/vendor/persist/sensors/registry/
+    chown system system /mnt/vendor/persist/sensors/registry/registry/
+    chown system system /mnt/vendor/persist/sensors/sensors_settings
+    chown system system /mnt/vendor/persist/sensors/sns.reg
+    chown system system /mnt/vendor/persist/sensors/version.txt
 
     # remove deprecated .reg
     rm /persist/sensors/sns.reg
@@ -18,19 +24,12 @@ on post-fs-data
 
 # Sensor service
 service sensors /odm/bin/sensors.qcom
-    class late_start
+    class core
     user system
     group system
     disabled
 
 # Start the service for unecrypted devices
-on property:ro.crypto.state=unencrypted
-    enable sensors
-
-# Enable the service for FBE devices
-on property:ro.crypto.type=file
-    enable sensors
-
-# Start the service for FDE devices
-on property:vold.decrypt=trigger_post_fs_data
+on property:sys.qcom.devup=1
     start sensors
+    enable sensors
